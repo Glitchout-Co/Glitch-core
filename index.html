@@ -9,7 +9,7 @@
 <body>
   <main>
     <header><p class="eyebrow">GLITCHOUT-CO · DEVELOPMENT BUILD</p><h1>Glitch-Core</h1></header>
-    <section class="scene" aria-labelledby="scene-title">
+    <section class="scene" id="character-stage" aria-labelledby="scene-title" tabindex="0">
       <div class="scene__sky" aria-hidden="true"></div>
       <div class="character" id="glitch-character" data-lifecycle="ready">
         <img class="character__art" src="./assets/characters/glitch/sprites/glitch-placeholder.svg" alt="Development placeholder illustration of Glitch, a cyan and magenta cyber fox">
@@ -18,6 +18,12 @@
       <div class="scene__copy">
         <p class="eyebrow">FIRST PRESENCE</p><h2 id="scene-title">Glitch’s den</h2>
         <p id="character-state">Glitch is waiting for the core to start.</p>
+        <div class="movement-controls" aria-label="Move Glitch">
+          <button type="button" data-move="left" disabled aria-label="Move Glitch left">← Left</button>
+          <button type="button" data-move="centre" disabled>Centre</button>
+          <button type="button" data-move="right" disabled aria-label="Move Glitch right">Right →</button>
+        </div>
+        <p class="movement-hint">Start the core, then use these controls or the left and right arrow keys.</p>
         <p class="asset-label">Development placeholder · not approved production artwork</p>
       </div>
     </section>

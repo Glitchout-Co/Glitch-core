@@ -5,9 +5,12 @@ import { createCharacterRenderer } from './presentation/character/renderer.js';
 const controller = createController();
 const status = document.querySelector('#status');
 const buttons = [...document.querySelectorAll('[data-command]')];
+const stage = document.querySelector('#character-stage');
+const movementButtons = [...document.querySelectorAll('[data-move]')];
 const character = createCharacterRenderer({
   root: document.querySelector('#glitch-character'),
-  stateText: document.querySelector('#character-state')
+  stateText: document.querySelector('#character-state'),
+  movementControls: movementButtons
 });
 fetch('./data/character/glitch.json')
   .then(response => {
@@ -30,4 +33,11 @@ for (const button of buttons) {
     if (result.listenerFailures) status.textContent = 'A presentation error occurred.';
   });
 }
+for (const button of movementButtons) {
+  button.addEventListener('click', () => character.move(button.dataset.move));
+}
+stage.addEventListener('keydown', event => {
+  const direction = { ArrowLeft: 'left', ArrowRight: 'right', Home: 'centre' }[event.key];
+  if (direction && character.move(direction).accepted) event.preventDefault();
+});
 render(controller.snapshot());
