@@ -1,0 +1,10 @@
+{
+  "id": "glitch",
+  "assetStatus": "development-placeholder",
+  "lifecycleText": {
+    "ready": "Glitch is waiting for the core to start.",
+    "running": "Glitch is present and the core is running.",
+    "paused": "Glitch is resting while the core is paused.",
+    "disabled": "Character presentation is disabled."
+  }
+}
