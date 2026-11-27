@@ -42,6 +42,18 @@
         <p class="asset-label asset-label--approved" id="character-asset-label">Approved character reference · standing pose</p>
       </div>
     </section>
+    <section class="conversation" aria-labelledby="conversation-title">
+      <h2 id="conversation-title">Talk with Glitch</h2>
+      <p class="note">This prototype recognises a small set of local phrases. Messages stay in this page session and are not sent or saved.</p>
+      <ol class="conversation__log" id="conversation-log" aria-live="polite" aria-relevant="additions"></ol>
+      <form class="conversation__form" id="conversation-form">
+        <label for="conversation-input">Message Glitch</label>
+        <div class="conversation__entry">
+          <input id="conversation-input" name="message" type="text" maxlength="300" autocomplete="off" disabled>
+          <button type="submit" id="conversation-send" disabled>Send</button>
+        </div>
+      </form>
+    </section>
     <section aria-labelledby="foundation-title">
       <h2 id="foundation-title">Core foundation</h2>
       <p>Guest session. Limited rule-based character presence is active; assistance and broader autonomous behaviour are not implemented.</p>

@@ -35,6 +35,12 @@ export function createPetInteraction({
       }, duration);
       return Object.freeze({ accepted: true });
     },
+    cancel() {
+      const wasReacting = timer !== null;
+      cancelReaction();
+      if (wasReacting) presence.release();
+      return Object.freeze({ cancelled: wasReacting });
+    },
     snapshot: () => Object.freeze({ lifecycle, reacting: timer !== null })
   });
 }

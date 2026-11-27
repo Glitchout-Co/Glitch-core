@@ -56,3 +56,20 @@ test('repeated petting restarts the reaction interval', () => {
   assert.equal(timers.length, 2);
   assert.deepEqual(cancelled, [timers[0]]);
 });
+
+test('higher-priority interaction can cancel petting', () => {
+  const timer = {};
+  const cancelled = [];
+  const presenceCalls = [];
+  const interaction = createPetInteraction({
+    character: { setPose() {} },
+    presence: { hold: () => presenceCalls.push('hold'), release: () => presenceCalls.push('release') },
+    schedule: () => timer,
+    cancel: value => cancelled.push(value)
+  });
+  interaction.setLifecycle('running');
+  interaction.pet();
+  assert.deepEqual(interaction.cancel(), { cancelled: true });
+  assert.deepEqual(cancelled, [timer]);
+  assert.deepEqual(presenceCalls, ['hold', 'release']);
+});
