@@ -1,0 +1,11 @@
+{
+  "name": "glitch-core",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node tools/dev-server.js",
+    "test": "node --test"
+  },
+  "engines": { "node": ">=22" }
+}
