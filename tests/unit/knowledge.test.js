@@ -11,6 +11,7 @@ test('character knowledge validates and retrieves immutable approved entries', (
   const knowledge = createCharacterKnowledge(data);
   const entry = knowledge.retrieve('origin');
   assert.match(entry.text, /fictional origin/i);
+  assert.match(knowledge.retrieve('origin', true).text, /embraced the name Glitch/i);
   assert.equal(Object.isFrozen(entry), true);
   assert.equal(knowledge.retrieve('unknown'), null);
 });
@@ -23,6 +24,9 @@ test('character knowledge rejects malformed, oversized and unknown-pose entries'
   const unknownPose = structuredClone(data);
   unknownPose.entries.origin.pose = 'flying';
   assert.equal(validateCharacterKnowledge(unknownPose), null);
+  const missingDetail = structuredClone(data);
+  delete missingDetail.entries.origin.detail;
+  assert.equal(validateCharacterKnowledge(missingDetail), null);
   const invalidId = structuredClone(data);
   invalidId.entries['Not Valid'] = invalidId.entries.origin;
   assert.equal(validateCharacterKnowledge(invalidId), null);

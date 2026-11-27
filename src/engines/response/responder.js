@@ -30,14 +30,15 @@ export function createResponder(dialogueValue, characterKnowledge) {
     remember(intent);
     return Object.freeze({ intent, text: entry.text, pose: entry.pose });
   };
-  const buildKnowledge = topic => {
-    const entry = characterKnowledge.retrieve(topic);
+  const buildKnowledge = (topic, detailed = false) => {
+    const entry = characterKnowledge.retrieve(topic, detailed);
     if (!entry) return build('fallback');
-    const intent = `knowledge:${topic}`;
+    const intent = `knowledge:${topic}${detailed ? ':detail' : ''}`;
     remember(intent);
     return Object.freeze({ intent, text: entry.text, pose: entry.pose });
   };
-  const latestTopic = () => [...history].reverse().find(intent => ['identity', 'identity-more', 'capabilities', 'movement', 'assistance-limited', 'assistance-reason'].includes(intent));
+  const contextualIntents = new Set(['identity', 'identity-more', 'capabilities', 'movement', 'assistance-limited', 'assistance-reason']);
+  const latestSubject = () => [...history].reverse().find(intent => contextualIntents.has(intent) || intent.startsWith('knowledge:'));
 
   return Object.freeze({
     respond(message) {
@@ -46,8 +47,9 @@ export function createResponder(dialogueValue, characterKnowledge) {
       if (!input) return build('invalid');
       if (/\bwhat about (movement|moving|walking)\b|\bhow do you move\b/.test(input)) return build('movement');
       if (/\bwhy (can't|cant|can not) you (help|assist)\b|\bwhy isn't assistance implemented\b/.test(input)) return build('assistance-reason');
-      if (/\b(tell me more|more about that|go on)\b/.test(input)) {
-        const topic = latestTopic();
+      if (/^(tell me more|more about that|go on|what else|why|why is that|how so)\??$/.test(input)) {
+        const topic = latestSubject();
+        if (topic?.startsWith('knowledge:')) return buildKnowledge(topic.split(':')[1], true);
         if (topic === 'identity' || topic === 'identity-more') return build('identity-more');
         if (topic === 'capabilities' || topic === 'movement') return build('movement');
         if (topic === 'assistance-limited' || topic === 'assistance-reason') return build('assistance-reason');

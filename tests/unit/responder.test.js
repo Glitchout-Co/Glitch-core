@@ -57,6 +57,21 @@ test('responder retrieves established character facts without treating them as c
   assert.match(local.respond('Are you conscious?').text, /not a living or conscious creature/i);
 });
 
+test('short follow-ups expand the latest approved character topic', () => {
+  const variations = ['Tell me more', 'What else?', 'Why?', 'How so?', 'Go on'];
+  for (const followup of variations) {
+    const local = responder();
+    local.respond('What is your origin?');
+    const response = local.respond(followup);
+    assert.equal(response.intent, 'knowledge:origin:detail');
+    assert.match(response.text, /name Glitch/i);
+  }
+  const local = responder();
+  local.respond('What is your origin?');
+  local.respond('What can you do?');
+  assert.equal(local.respond('Tell me more').intent, 'movement');
+});
+
 test('temporary context supports relevant follow-ups without retaining messages', () => {
   const local = responder();
   assert.equal(local.respond('Tell me more').intent, 'followup-missing');
