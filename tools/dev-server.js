@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const port = Number(process.env.PORT ?? 8000);
-const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml; charset=utf-8' };
+const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png' };
 createServer(async (request, response) => {
   try {
     const path = new URL(request.url, 'http://localhost').pathname;
@@ -13,7 +13,7 @@ createServer(async (request, response) => {
     if (!['GET', 'HEAD'].includes(request.method) ||
         !(file === 'index.html' || /^src\/(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-]+\.(?:js|css)$/.test(file) ||
           /^data\/character\/[a-zA-Z0-9_-]+\.json$/.test(file) ||
-          /^assets\/characters\/glitch\/sprites\/[a-zA-Z0-9_-]+\.svg$/.test(file))) {
+          /^assets\/characters\/glitch\/sprites\/[a-zA-Z0-9_-]+\.png$/.test(file))) {
       response.writeHead(404).end(); return;
     }
     const content = await readFile(resolve(root, file));

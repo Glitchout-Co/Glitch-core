@@ -1,6 +1,7 @@
 {
   "id": "glitch",
-  "assetStatus": "development-placeholder",
+  "assetStatus": "approved-reference",
+  "activePose": "standing",
   "lifecycleText": {
     "ready": "Glitch is waiting for the core to start.",
     "running": "Glitch is present and the core is running.",
