@@ -55,6 +55,10 @@ test('responder retrieves established character facts without treating them as c
   assert.match(local.respond('What is your favourite treat?').text, /Pixel Berries/);
   assert.match(local.respond('Why do you wear your collar?').text, /does not represent ownership/i);
   assert.match(local.respond('Are you conscious?').text, /not a living or conscious creature/i);
+  assert.match(local.respond('Who created you?').text, /parental figure/i);
+  assert.match(local.respond('Tell me about glitch portals').text, /independently authorised digital worlds/i);
+  assert.match(local.respond('Tell me more').text, /approved integrations/i);
+  assert.match(local.respond('What is your philosophy?').text, /imperfection needs to be fixed/i);
 });
 
 test('short follow-ups expand the latest approved character topic', () => {
@@ -70,6 +74,16 @@ test('short follow-ups expand the latest approved character topic', () => {
   local.respond('What is your origin?');
   local.respond('What can you do?');
   assert.equal(local.respond('Tell me more').intent, 'movement');
+});
+
+test('a completed topic offers validated related subjects instead of repeating detail', () => {
+  const local = responder();
+  local.respond('Tell me about your origin');
+  local.respond('Tell me more');
+  const complete = local.respond('What else?');
+  assert.equal(complete.intent, 'knowledge:origin:complete');
+  assert.match(complete.text, /approved information/i);
+  assert.match(complete.text, /my appearance/i);
 });
 
 test('temporary context supports relevant follow-ups without retaining messages', () => {

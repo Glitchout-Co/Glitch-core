@@ -14,6 +14,11 @@ test('character knowledge validates and retrieves immutable approved entries', (
   assert.match(knowledge.retrieve('origin', true).text, /embraced the name Glitch/i);
   assert.equal(Object.isFrozen(entry), true);
   assert.equal(knowledge.retrieve('unknown'), null);
+  assert.equal(knowledge.search('Could you tell me WHO CREATED YOU?').topic, 'creator');
+  assert.equal(knowledge.search('Do you use glitch portals?').topic, 'portals');
+  assert.equal(knowledge.search('unrelated question'), null);
+  assert.equal(knowledge.related('origin')[0].topic, 'appearance');
+  assert.equal(Object.isFrozen(knowledge.related('origin')), true);
 });
 
 test('character knowledge rejects malformed, oversized and unknown-pose entries', () => {
@@ -30,4 +35,10 @@ test('character knowledge rejects malformed, oversized and unknown-pose entries'
   const invalidId = structuredClone(data);
   invalidId.entries['Not Valid'] = invalidId.entries.origin;
   assert.equal(validateCharacterKnowledge(invalidId), null);
+  const duplicateAlias = structuredClone(data);
+  duplicateAlias.index.personality.push(duplicateAlias.index.appearance[0]);
+  assert.equal(validateCharacterKnowledge(duplicateAlias), null);
+  const brokenRelationship = structuredClone(data);
+  brokenRelationship.relationships.origin.push('unknown');
+  assert.equal(validateCharacterKnowledge(brokenRelationship), null);
 });

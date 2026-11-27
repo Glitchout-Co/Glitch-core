@@ -19,7 +19,7 @@ export function validateDialogue(value) {
 export function createResponder(dialogueValue, characterKnowledge) {
   const dialogue = validateDialogue(dialogueValue);
   if (!dialogue) throw new TypeError('Dialogue data is invalid or incomplete.');
-  if (!characterKnowledge || typeof characterKnowledge.retrieve !== 'function') throw new TypeError('Character knowledge adapter is required.');
+  if (!characterKnowledge || typeof characterKnowledge.retrieve !== 'function' || typeof characterKnowledge.search !== 'function' || typeof characterKnowledge.related !== 'function') throw new TypeError('Character knowledge adapter is required.');
   const history = [];
   const remember = intent => {
     if (!['invalid', 'fallback', 'followup-missing'].includes(intent)) history.push(intent);
@@ -49,23 +49,22 @@ export function createResponder(dialogueValue, characterKnowledge) {
       if (/\bwhy (can't|cant|can not) you (help|assist)\b|\bwhy isn't assistance implemented\b/.test(input)) return build('assistance-reason');
       if (/^(tell me more|more about that|go on|what else|why|why is that|how so)\??$/.test(input)) {
         const topic = latestSubject();
-        if (topic?.startsWith('knowledge:')) return buildKnowledge(topic.split(':')[1], true);
+        if (topic?.startsWith('knowledge:')) {
+          const knowledgeTopic = topic.split(':')[1];
+          if (!topic.endsWith(':detail')) return buildKnowledge(knowledgeTopic, true);
+          const suggestions = characterKnowledge.related(knowledgeTopic).slice(0, 3).map(item => item.title);
+          const text = suggestions.length
+            ? `That's all the approved information I have on that topic for now. You could ask about ${suggestions.join(', ')}.`
+            : "That's all the approved information I have on that topic for now.";
+          return Object.freeze({ intent: `knowledge:${knowledgeTopic}:complete`, text, pose: 'thinking' });
+        }
         if (topic === 'identity' || topic === 'identity-more') return build('identity-more');
         if (topic === 'capabilities' || topic === 'movement') return build('movement');
         if (topic === 'assistance-limited' || topic === 'assistance-reason') return build('assistance-reason');
         return build('followup-missing');
       }
-      if (/\bwhat do you look like\b|\bdescribe (yourself|your appearance)\b|\b(your|the) (appearance|markings|tail|eyes)\b/.test(input)) return buildKnowledge('appearance');
-      if (/\b(your|the) personality\b|\bwhat are you like\b/.test(input)) return buildKnowledge('personality');
-      if (/\b(your|the) (origin|backstory)\b|\bhow (were|was) you (created|made)\b|\bwhere did you come from\b/.test(input)) return buildKnowledge('origin');
-      if (/\b(your|the) (home|den)\b|\bwhere do you live\b/.test(input)) return buildKnowledge('home');
-      if (/\b(pixel berries|favo(?:u)?rite (food|treat))\b/.test(input)) return buildKnowledge('favourite-treat');
-      if (/\bfavo(?:u)?rite colou?r/.test(input)) return buildKnowledge('favourite-colours');
-      if (/\bfavo(?:u)?rite weather/.test(input)) return buildKnowledge('favourite-weather');
-      if (/\b(your|the) collar\b|\bwhy do you wear (a|that|your) collar\b/.test(input)) return buildKnowledge('collar');
-      if (/\bwhat do you (like|enjoy) doing\b|\b(your|the) (hobbies|pastimes)\b/.test(input)) return buildKnowledge('pastimes');
-      if (/\bwhat do you dislike\b|\bthings you (hate|dislike)\b/.test(input)) return buildKnowledge('dislikes');
-      if (/\b(are you (alive|real|conscious|sentient)|do you have (real )?(feelings|emotions))\b/.test(input)) return buildKnowledge('digital-nature');
+      const knowledgeMatch = characterKnowledge.search(input);
+      if (knowledgeMatch) return buildKnowledge(knowledgeMatch.topic);
       if (/\b(hello|hi|hey|greetings)\b/.test(input)) return build('greeting');
       if (/\b(who|what) are you\b|\btell me about yourself\b/.test(input)) return build('identity');
       if (/\bwhat can you do\b|\bcapabilit(?:y|ies)\b/.test(input)) return build('capabilities');

@@ -22,7 +22,7 @@ Open http://127.0.0.1:8000/ in a browser. Stop the local server with Ctrl+C. No 
 - assets/characters/glitch/sprites/: renderer-ready poses extracted from approved artwork.
 - data/character/: non-authoritative presentation copy and asset metadata.
 - data/dialogue/: validated authored dialogue content, separate from response logic.
-- data/knowledge/: validated local character facts derived from the authoritative Character Codex.
+- data/knowledge/: validated local character dictionary derived from the authoritative Character Codex, including its rebuildable terminology index and approved topic relationships.
 - tests/unit/: native Node.js tests.
 - tools/: local development utilities, not production resources.
 - docs/development/: practical development instructions.
