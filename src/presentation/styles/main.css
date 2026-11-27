@@ -34,7 +34,10 @@ button:focus-visible { outline: 3px solid #f1d199; outline-offset: 3px; }
 .pose-controls { margin-top: .8rem; }
 .pose-controls button { min-height: 40px; padding: .45rem .65rem; font-size: .85rem; }
 .movement-hint { color: #b9c7d3; font-size: .8rem; margin-bottom: .8rem; }
-.scene:focus-visible { outline: 3px solid #f1d199; outline-offset: 3px; }
+.presence-note { color: #b9c7d3; font-size: .9rem; }
+.developer-panel { margin: .8rem 0; padding: .6rem .7rem; border: 1px solid #485d70; border-radius: .6rem; background: rgba(20,28,39,.45); }
+.developer-panel summary { cursor: pointer; color: #b9c7d3; font-size: .85rem; }
+.developer-panel[open] summary { margin-bottom: .75rem; }
 @keyframes glitch-idle-right { 0%, 100% { transform: translateY(0) scale(1, 1); } 50% { transform: translateY(-.35rem) scale(1, 1.012); } }
 @keyframes glitch-idle-left { 0%, 100% { transform: translateY(0) scale(-1, 1); } 50% { transform: translateY(-.35rem) scale(-1, 1.012); } }
 @media (max-width: 37rem) { .scene { grid-template-columns: 1fr; } .character { min-height: 13rem; } .character__art { max-height: 14rem; } }

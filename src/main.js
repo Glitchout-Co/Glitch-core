@@ -1,11 +1,11 @@
 import { createController } from './core/controller.js';
 import { nextLifecycle } from './core/lifecycle.js';
 import { createCharacterRenderer } from './presentation/character/renderer.js';
+import { createPresenceBehaviour } from './engines/behaviour/presence.js';
 
 const controller = createController();
 const status = document.querySelector('#status');
 const buttons = [...document.querySelectorAll('[data-command]')];
-const stage = document.querySelector('#character-stage');
 const movementButtons = [...document.querySelectorAll('[data-move]')];
 const poseButtons = [...document.querySelectorAll('[data-pose]')];
 const character = createCharacterRenderer({
@@ -14,6 +14,10 @@ const character = createCharacterRenderer({
   movementControls: movementButtons,
   poseControls: poseButtons,
   assetLabel: document.querySelector('#character-asset-label')
+});
+const presence = createPresenceBehaviour({
+  character,
+  isReducedMotion: () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 });
 fetch('./data/character/glitch.json')
   .then(response => {
@@ -25,6 +29,7 @@ fetch('./data/character/glitch.json')
 function render(snapshot) {
   status.textContent = `Core lifecycle: ${snapshot.lifecycle} · Guest mode`;
   character.render(snapshot);
+  presence.setLifecycle(snapshot.lifecycle);
   for (const button of buttons) {
     button.disabled = !nextLifecycle(snapshot.lifecycle, button.dataset.command);
   }
@@ -42,8 +47,4 @@ for (const button of movementButtons) {
 for (const button of poseButtons) {
   button.addEventListener('click', () => character.setPose(button.dataset.pose));
 }
-stage.addEventListener('keydown', event => {
-  const direction = { ArrowLeft: 'left', ArrowRight: 'right', Home: 'centre' }[event.key];
-  if (direction && character.move(direction).accepted) event.preventDefault();
-});
 render(controller.snapshot());
