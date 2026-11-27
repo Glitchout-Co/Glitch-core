@@ -2,9 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createResponder, validateDialogue } from '../../src/engines/response/responder.js';
+import { createCharacterKnowledge } from '../../src/engines/response/knowledge.js';
 
 const dialogue = JSON.parse(readFileSync(new URL('../../data/dialogue/core.json', import.meta.url), 'utf8'));
-const responder = () => createResponder(dialogue);
+const knowledge = JSON.parse(readFileSync(new URL('../../data/knowledge/character.json', import.meta.url), 'utf8'));
+const responder = () => createResponder(dialogue, createCharacterKnowledge(knowledge));
 
 test('dialogue package validates and initial intents remain available', () => {
   assert.ok(validateDialogue(dialogue));
@@ -28,7 +30,7 @@ test('dialogue validation rejects missing, oversized or unknown-pose entries', (
   const unknownPose = structuredClone(dialogue);
   unknownPose.responses.greeting.pose = 'flying';
   assert.equal(validateDialogue(unknownPose), null);
-  assert.throws(() => createResponder(missing), TypeError);
+  assert.throws(() => createResponder(missing, createCharacterKnowledge(knowledge)), TypeError);
 });
 
 test('responder is honest about unsupported and invalid input', () => {
@@ -45,6 +47,14 @@ test('identity response distinguishes fiction from implementation', () => {
   const response = responder().respond('Tell me about yourself');
   assert.match(response.text, /software, artwork and data/i);
   assert.match(response.text, /not a living or conscious creature/i);
+});
+
+test('responder retrieves established character facts without treating them as capabilities', () => {
+  const local = responder();
+  assert.equal(local.respond('What do you look like?').intent, 'knowledge:appearance');
+  assert.match(local.respond('What is your favourite treat?').text, /Pixel Berries/);
+  assert.match(local.respond('Why do you wear your collar?').text, /does not represent ownership/i);
+  assert.match(local.respond('Are you conscious?').text, /not a living or conscious creature/i);
 });
 
 test('temporary context supports relevant follow-ups without retaining messages', () => {

@@ -5,6 +5,7 @@ import { createPresenceBehaviour } from './engines/behaviour/presence.js';
 import { createPetInteraction } from './engines/behaviour/interactions.js';
 import { createRestBehaviour } from './engines/behaviour/rest.js';
 import { createResponder } from './engines/response/responder.js';
+import { createCharacterKnowledge } from './engines/response/knowledge.js';
 import { createConversationInteraction } from './engines/response/conversation.js';
 
 const controller = createController();
@@ -54,19 +55,19 @@ fetch('./data/character/glitch.json')
   })
   .then(data => character.configure(data))
   .catch(() => character.useFallback('Character data is unavailable.'));
-fetch('./data/dialogue/core.json')
-  .then(response => {
-    if (!response.ok) throw new Error('Dialogue data unavailable');
-    return response.json();
+Promise.all([fetch('./data/dialogue/core.json'), fetch('./data/knowledge/character.json')])
+  .then(async ([dialogueResponse, knowledgeResponse]) => {
+    if (!dialogueResponse.ok || !knowledgeResponse.ok) throw new Error('Conversation resources unavailable');
+    return Promise.all([dialogueResponse.json(), knowledgeResponse.json()]);
   })
-  .then(data => {
-    responder = createResponder(data);
+  .then(([dialogue, knowledge]) => {
+    responder = createResponder(dialogue, createCharacterKnowledge(knowledge));
     dialogueReady = true;
     render(controller.snapshot());
   })
   .catch(() => {
     dialogueReady = false;
-    appendMessage('Glitch', 'Conversation data could not be loaded. Character controls remain available.');
+    appendMessage('Glitch', 'Conversation resources could not be loaded. Character controls remain available.');
   });
 function render(snapshot) {
   status.textContent = `Core lifecycle: ${snapshot.lifecycle} · Guest mode`;

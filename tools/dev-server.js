@@ -14,6 +14,7 @@ createServer(async (request, response) => {
         !(file === 'index.html' || /^src\/(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-]+\.(?:js|css)$/.test(file) ||
           /^data\/character\/[a-zA-Z0-9_-]+\.json$/.test(file) ||
           /^data\/dialogue\/[a-zA-Z0-9_-]+\.json$/.test(file) ||
+          /^data\/knowledge\/[a-zA-Z0-9_-]+\.json$/.test(file) ||
           /^assets\/characters\/glitch\/sprites\/[a-zA-Z0-9_-]+\.png$/.test(file))) {
       response.writeHead(404).end(); return;
     }

@@ -16,9 +16,10 @@ export function validateDialogue(value) {
   return Object.freeze({ schemaVersion: 1, responses: Object.freeze(responses) });
 }
 
-export function createResponder(dialogueValue) {
+export function createResponder(dialogueValue, characterKnowledge) {
   const dialogue = validateDialogue(dialogueValue);
   if (!dialogue) throw new TypeError('Dialogue data is invalid or incomplete.');
+  if (!characterKnowledge || typeof characterKnowledge.retrieve !== 'function') throw new TypeError('Character knowledge adapter is required.');
   const history = [];
   const remember = intent => {
     if (!['invalid', 'fallback', 'followup-missing'].includes(intent)) history.push(intent);
@@ -26,6 +27,13 @@ export function createResponder(dialogueValue) {
   };
   const build = intent => {
     const entry = dialogue.responses[intent];
+    remember(intent);
+    return Object.freeze({ intent, text: entry.text, pose: entry.pose });
+  };
+  const buildKnowledge = topic => {
+    const entry = characterKnowledge.retrieve(topic);
+    if (!entry) return build('fallback');
+    const intent = `knowledge:${topic}`;
     remember(intent);
     return Object.freeze({ intent, text: entry.text, pose: entry.pose });
   };
@@ -45,6 +53,17 @@ export function createResponder(dialogueValue) {
         if (topic === 'assistance-limited' || topic === 'assistance-reason') return build('assistance-reason');
         return build('followup-missing');
       }
+      if (/\bwhat do you look like\b|\bdescribe (yourself|your appearance)\b|\b(your|the) (appearance|markings|tail|eyes)\b/.test(input)) return buildKnowledge('appearance');
+      if (/\b(your|the) personality\b|\bwhat are you like\b/.test(input)) return buildKnowledge('personality');
+      if (/\b(your|the) (origin|backstory)\b|\bhow (were|was) you (created|made)\b|\bwhere did you come from\b/.test(input)) return buildKnowledge('origin');
+      if (/\b(your|the) (home|den)\b|\bwhere do you live\b/.test(input)) return buildKnowledge('home');
+      if (/\b(pixel berries|favo(?:u)?rite (food|treat))\b/.test(input)) return buildKnowledge('favourite-treat');
+      if (/\bfavo(?:u)?rite colou?r/.test(input)) return buildKnowledge('favourite-colours');
+      if (/\bfavo(?:u)?rite weather/.test(input)) return buildKnowledge('favourite-weather');
+      if (/\b(your|the) collar\b|\bwhy do you wear (a|that|your) collar\b/.test(input)) return buildKnowledge('collar');
+      if (/\bwhat do you (like|enjoy) doing\b|\b(your|the) (hobbies|pastimes)\b/.test(input)) return buildKnowledge('pastimes');
+      if (/\bwhat do you dislike\b|\bthings you (hate|dislike)\b/.test(input)) return buildKnowledge('dislikes');
+      if (/\b(are you (alive|real|conscious|sentient)|do you have (real )?(feelings|emotions))\b/.test(input)) return buildKnowledge('digital-nature');
       if (/\b(hello|hi|hey|greetings)\b/.test(input)) return build('greeting');
       if (/\b(who|what) are you\b|\btell me about yourself\b/.test(input)) return build('identity');
       if (/\bwhat can you do\b|\bcapabilit(?:y|ies)\b/.test(input)) return build('capabilities');
