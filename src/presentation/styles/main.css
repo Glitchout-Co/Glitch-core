@@ -9,7 +9,7 @@ section { background: #202c3a; border: 1px solid #485d70; border-radius: 1rem; p
 h2 { margin-top: 0; }
 p { line-height: 1.6; }
 #status { color: #9ce5ef; font-weight: 600; }
-.controls, .movement-controls, .pose-controls { display: flex; flex-wrap: wrap; gap: .65rem; }
+.controls, .movement-controls, .pose-controls, .interaction-controls { display: flex; flex-wrap: wrap; gap: .65rem; }
 button { font: inherit; min-height: 44px; padding: .6rem 1rem; border: 1px solid #83dce8; border-radius: .6rem; color: #edf4fa; background: #263f4f; }
 button:disabled { opacity: .45; }
 button:focus-visible { outline: 3px solid #f1d199; outline-offset: 3px; }
@@ -36,6 +36,8 @@ button:focus-visible { outline: 3px solid #f1d199; outline-offset: 3px; }
 .pose-controls button { min-height: 40px; padding: .45rem .65rem; font-size: .85rem; }
 .movement-hint { color: #b9c7d3; font-size: .8rem; margin-bottom: .8rem; }
 .presence-note { color: #b9c7d3; font-size: .9rem; }
+.interaction-controls { margin: .7rem 0; }
+#pet-glitch { background: linear-gradient(135deg, #263f4f, #463255); }
 .developer-panel { margin: .8rem 0; padding: .6rem .7rem; border: 1px solid #485d70; border-radius: .6rem; background: rgba(20,28,39,.45); }
 .developer-panel summary { cursor: pointer; color: #b9c7d3; font-size: .85rem; }
 .developer-panel[open] summary { margin-bottom: .75rem; }

@@ -26,10 +26,11 @@ export function createPresenceBehaviour({
   if (!character?.setPose || !character?.move) throw new TypeError('Presence behaviour requires a character presentation adapter.');
   let lifecycle = 'ready';
   let timer = null;
+  let held = false;
 
   const execute = action => action.type === 'pose' ? character.setPose(action.value) : character.move(action.value);
   const queue = () => {
-    if (lifecycle !== 'running' || timer !== null) return;
+    if (lifecycle !== 'running' || held || timer !== null) return;
     const reduced = Boolean(isReducedMotion());
     const delay = (reduced ? 12000 : 7000) + Math.floor(random() * (reduced ? 6000 : 5000));
     timer = schedule(() => {
@@ -47,8 +48,11 @@ export function createPresenceBehaviour({
   return Object.freeze({
     setLifecycle(nextLifecycle) {
       lifecycle = nextLifecycle;
-      if (lifecycle === 'running') queue(); else stop();
+      if (lifecycle === 'running') queue(); else { held = false; stop(); }
     },
-    snapshot: () => Object.freeze({ lifecycle, scheduled: timer !== null })
+    reset() { stop(); queue(); },
+    hold() { held = true; stop(); },
+    release() { held = false; queue(); },
+    snapshot: () => Object.freeze({ lifecycle, scheduled: timer !== null, held })
   });
 }

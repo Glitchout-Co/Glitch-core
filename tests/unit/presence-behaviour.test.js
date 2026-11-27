@@ -25,7 +25,7 @@ test('presence routine schedules only while running and cancels on pause', () =>
     cancel: token => cancelled.push(token)
   });
 
-  assert.deepEqual(presence.snapshot(), { lifecycle: 'ready', scheduled: false });
+  assert.deepEqual(presence.snapshot(), { lifecycle: 'ready', scheduled: false, held: false });
   presence.setLifecycle('running');
   assert.equal(scheduled.length, 1);
   assert.equal(scheduled[0].delay, 7000);
@@ -34,7 +34,29 @@ test('presence routine schedules only while running and cancels on pause', () =>
   assert.equal(scheduled.length, 2);
   presence.setLifecycle('paused');
   assert.deepEqual(cancelled, [scheduled[1]]);
-  assert.deepEqual(presence.snapshot(), { lifecycle: 'paused', scheduled: false });
+  assert.deepEqual(presence.snapshot(), { lifecycle: 'paused', scheduled: false, held: false });
+});
+
+test('button-style reset restarts the interval and interaction hold blocks scheduling', () => {
+  const scheduled = [];
+  const cancelled = [];
+  const presence = createPresenceBehaviour({
+    character: { setPose() {}, move() {} },
+    random: () => 0,
+    schedule: callback => { const token = { callback }; scheduled.push(token); return token; },
+    cancel: token => cancelled.push(token)
+  });
+  presence.setLifecycle('running');
+  presence.reset();
+  assert.deepEqual(cancelled, [scheduled[0]]);
+  assert.equal(scheduled.length, 2);
+  presence.hold();
+  assert.equal(presence.snapshot().held, true);
+  assert.deepEqual(cancelled, [scheduled[0], scheduled[1]]);
+  presence.reset();
+  assert.equal(scheduled.length, 2);
+  presence.release();
+  assert.equal(scheduled.length, 3);
 });
 
 test('reduced motion excludes positional movement and lengthens intervals', () => {
