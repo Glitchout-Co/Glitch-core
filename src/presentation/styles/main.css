@@ -20,8 +20,9 @@ button:focus-visible { outline: 3px solid #f1d199; outline-offset: 3px; }
 .character, .scene__copy { position: relative; z-index: 1; }
 .character { --character-offset: 0rem; min-height: 18rem; display: grid; place-items: end center; transform: translateX(var(--character-offset)); transition: transform 180ms ease-out, opacity 180ms ease-out; }
 .character__art { display: block; width: min(115%, 22rem); max-height: 19rem; object-fit: contain; filter: drop-shadow(0 .7rem 1rem rgba(0,0,0,.45)); }
-.character[data-lifecycle="running"] .character__art { animation: glitch-idle-right 3.8s ease-in-out infinite; }
-.character[data-lifecycle="running"][data-direction="left"] .character__art { animation-name: glitch-idle-left; }
+.character[data-lifecycle="running"] .character__art { animation: glitch-idle-face-left 3.8s ease-in-out infinite; }
+.character[data-lifecycle="running"][data-direction="left"] .character__art { animation-name: glitch-idle-face-left; }
+.character[data-lifecycle="running"][data-direction="right"] .character__art { animation-name: glitch-idle-face-right; }
 .character[data-lifecycle="paused"] { opacity: .72; }
 .character[data-lifecycle="disabled"] { opacity: .28; filter: grayscale(1); }
 .character__fallback { align-self: center; max-width: 15rem; text-align: center; color: #b9c7d3; }
@@ -38,7 +39,7 @@ button:focus-visible { outline: 3px solid #f1d199; outline-offset: 3px; }
 .developer-panel { margin: .8rem 0; padding: .6rem .7rem; border: 1px solid #485d70; border-radius: .6rem; background: rgba(20,28,39,.45); }
 .developer-panel summary { cursor: pointer; color: #b9c7d3; font-size: .85rem; }
 .developer-panel[open] summary { margin-bottom: .75rem; }
-@keyframes glitch-idle-right { 0%, 100% { transform: translateY(0) scale(1, 1); } 50% { transform: translateY(-.35rem) scale(1, 1.012); } }
-@keyframes glitch-idle-left { 0%, 100% { transform: translateY(0) scale(-1, 1); } 50% { transform: translateY(-.35rem) scale(-1, 1.012); } }
+@keyframes glitch-idle-face-left { 0%, 100% { transform: translateY(0) scale(1, 1); } 50% { transform: translateY(-.35rem) scale(1, 1.012); } }
+@keyframes glitch-idle-face-right { 0%, 100% { transform: translateY(0) scale(-1, 1); } 50% { transform: translateY(-.35rem) scale(-1, 1.012); } }
 @media (max-width: 37rem) { .scene { grid-template-columns: 1fr; } .character { min-height: 13rem; } .character__art { max-height: 14rem; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
