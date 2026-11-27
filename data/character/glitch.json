@@ -2,6 +2,44 @@
   "id": "glitch",
   "assetStatus": "approved-reference",
   "activePose": "standing",
+  "poses": {
+    "standing": {
+      "src": "./assets/characters/glitch/sprites/glitch-standing.png",
+      "alt": "Glitch standing alert with her luminous tail raised",
+      "label": "Approved character reference · standing pose",
+      "status": "Glitch is standing and ready."
+    },
+    "sitting": {
+      "src": "./assets/characters/glitch/sprites/glitch-sitting.png",
+      "alt": "Glitch sitting cheerfully with her luminous tail curled beside her",
+      "label": "Approved character reference · sitting pose",
+      "status": "Glitch sits attentively."
+    },
+    "thinking": {
+      "src": "./assets/characters/glitch/sprites/glitch-thinking.png",
+      "alt": "Glitch sitting with one paw beneath her chin in thought",
+      "label": "Approved character reference · thinking pose",
+      "status": "Glitch adopts her thinking pose."
+    },
+    "playful": {
+      "src": "./assets/characters/glitch/sprites/glitch-playful.png",
+      "alt": "Glitch crouching playfully and winking",
+      "label": "Approved character reference · playful pose",
+      "status": "Glitch strikes a playful pose."
+    },
+    "greeting": {
+      "src": "./assets/characters/glitch/sprites/glitch-greeting.png",
+      "alt": "Glitch sitting and waving one glowing paw",
+      "label": "Approved character reference · greeting pose",
+      "status": "Glitch gives you a cheerful wave."
+    },
+    "resting": {
+      "src": "./assets/characters/glitch/sprites/glitch-resting.png",
+      "alt": "Glitch sleeping peacefully curled around her luminous tail",
+      "label": "Approved character reference · resting pose",
+      "status": "Glitch settles into her resting pose."
+    }
+  },
   "lifecycleText": {
     "ready": "Glitch is waiting for the core to start.",
     "running": "Glitch is present and the core is running.",

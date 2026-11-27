@@ -24,7 +24,16 @@
           <button type="button" data-move="right" disabled aria-label="Move Glitch right">Right →</button>
         </div>
         <p class="movement-hint">Start the core, then use these controls or the left and right arrow keys.</p>
-        <p class="asset-label asset-label--approved">Approved character reference · standing pose</p>
+        <div class="pose-controls" aria-label="Choose Glitch’s pose">
+          <button type="button" data-pose="standing" disabled>Stand</button>
+          <button type="button" data-pose="sitting" disabled>Sit</button>
+          <button type="button" data-pose="thinking" disabled>Think</button>
+          <button type="button" data-pose="playful" disabled>Play</button>
+          <button type="button" data-pose="greeting" disabled>Greet</button>
+          <button type="button" data-pose="resting" disabled>Rest</button>
+        </div>
+        <p class="movement-hint">Pose changes are manual presentation tests, not autonomous behaviour.</p>
+        <p class="asset-label asset-label--approved" id="character-asset-label">Approved character reference · standing pose</p>
       </div>
     </section>
     <section aria-labelledby="foundation-title">

@@ -7,10 +7,13 @@ const status = document.querySelector('#status');
 const buttons = [...document.querySelectorAll('[data-command]')];
 const stage = document.querySelector('#character-stage');
 const movementButtons = [...document.querySelectorAll('[data-move]')];
+const poseButtons = [...document.querySelectorAll('[data-pose]')];
 const character = createCharacterRenderer({
   root: document.querySelector('#glitch-character'),
   stateText: document.querySelector('#character-state'),
-  movementControls: movementButtons
+  movementControls: movementButtons,
+  poseControls: poseButtons,
+  assetLabel: document.querySelector('#character-asset-label')
 });
 fetch('./data/character/glitch.json')
   .then(response => {
@@ -35,6 +38,9 @@ for (const button of buttons) {
 }
 for (const button of movementButtons) {
   button.addEventListener('click', () => character.move(button.dataset.move));
+}
+for (const button of poseButtons) {
+  button.addEventListener('click', () => character.setPose(button.dataset.pose));
 }
 stage.addEventListener('keydown', event => {
   const direction = { ArrowLeft: 'left', ArrowRight: 'right', Home: 'centre' }[event.key];
