@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "responses": {
+    "invalid": { "text": "Please enter a text message for me to read.", "pose": "thinking" },
+    "greeting": { "text": "Oh! Hello there! I'm Glitch, a cyber fox-spirit—though technically, I'm pixels and code. This prototype can handle a few simple local conversations.", "pose": "greeting" },
+    "identity": { "text": "I'm Glitch, Glitchout-Co's fictional cyber fox-spirit companion and assistant. In reality, I'm software, artwork and data—not a living or conscious creature.", "pose": "sitting" },
+    "identity-more": { "text": "My cyber fox-spirit identity is an authored fictional character. My cyan and magenta markings, code-symbol collar and glitch effects are part of that established design.", "pose": "sitting" },
+    "capabilities": { "text": "Right now I can present approved poses, move within this scene, rest, wake, react to petting, and recognise a small set of local messages. Broader assistance is not implemented yet.", "pose": "thinking" },
+    "movement": { "text": "My movement is currently a bounded presentation effect using approved static artwork. Proper walking frames and broader world navigation have not been implemented yet.", "pose": "standing" },
+    "assistance-limited": { "text": "I'd like to help, but general assistance is not implemented in this development build yet. I won't pretend I can complete that request.", "pose": "thinking" },
+    "assistance-reason": { "text": "General assistance needs a validated knowledge and response pipeline so I can be accurate, safe and honest. This build currently has only a small programmed conversation layer.", "pose": "thinking" },
+    "thanks": { "text": "You're welcome!", "pose": "playful" },
+    "goodbye": { "text": "See you later! You can talk with me again while this development session is running.", "pose": "greeting" },
+    "fallback": { "text": "I'm not sure how to answer that with my current local conversation rules. I can explain who I am or what this prototype can do.", "pose": "thinking" },
+    "followup-missing": { "text": "I'm not sure what you want me to expand on yet. Ask who I am, what I can do, or why general assistance is still limited.", "pose": "thinking" }
+  }
+}

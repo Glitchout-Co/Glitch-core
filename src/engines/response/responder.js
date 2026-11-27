@@ -1,27 +1,59 @@
+const REQUIRED_RESPONSES = Object.freeze([
+  'invalid', 'greeting', 'identity', 'identity-more', 'capabilities', 'movement',
+  'assistance-limited', 'assistance-reason', 'thanks', 'goodbye', 'fallback', 'followup-missing'
+]);
+const ALLOWED_POSES = new Set(['standing', 'sitting', 'thinking', 'playful', 'greeting', 'resting']);
 const clean = message => message.trim().toLowerCase().replace(/[^a-z0-9?' ]+/g, ' ').replace(/\s+/g, ' ');
-const result = (intent, text, pose) => Object.freeze({ intent, text, pose });
 
-export function respondToMessage(message) {
-  if (typeof message !== 'string') return result('invalid', 'I can only read text messages in this prototype.', 'thinking');
-  const input = clean(message.slice(0, 300));
-  if (!input) return result('invalid', 'Please enter a message for me to read.', 'thinking');
-  if (/\b(hello|hi|hey|greetings)\b/.test(input)) {
-    return result('greeting', "Oh! Hello there! I'm Glitch, a cyber fox-spirit—though technically, I'm pixels and code. This prototype can handle a few simple local conversations.", 'greeting');
+export function validateDialogue(value) {
+  if (!value || value.schemaVersion !== 1 || !value.responses || typeof value.responses !== 'object') return null;
+  const responses = {};
+  for (const key of REQUIRED_RESPONSES) {
+    const entry = value.responses[key];
+    if (!entry || typeof entry.text !== 'string' || !entry.text.trim() || entry.text.length > 600 || !ALLOWED_POSES.has(entry.pose)) return null;
+    responses[key] = Object.freeze({ text: entry.text, pose: entry.pose });
   }
-  if (/\b(who|what) are you\b|\btell me about yourself\b/.test(input)) {
-    return result('identity', "I'm Glitch, Glitchout-Co's fictional cyber fox-spirit companion and assistant. In reality, I'm software, artwork and data—not a living or conscious creature.", 'sitting');
-  }
-  if (/\bwhat can you do\b|\bcapabilit(?:y|ies)\b/.test(input)) {
-    return result('capabilities', 'Right now I can present approved poses, move within this scene, rest, wake, react to petting, and recognise a small set of local messages. Broader assistance is not implemented yet.', 'thinking');
-  }
-  if (/\b(help|assist|solve|question)\b/.test(input)) {
-    return result('assistance-limited', "I'd like to help, but general assistance is not implemented in this development build yet. I won't pretend I can complete that request.", 'thinking');
-  }
-  if (/\b(thank you|thanks|thankyou)\b/.test(input)) {
-    return result('thanks', "You're welcome!", 'playful');
-  }
-  if (/\b(goodbye|bye|see you|farewell)\b/.test(input)) {
-    return result('goodbye', 'See you later! You can talk with me again while this development session is running.', 'greeting');
-  }
-  return result('fallback', "I'm not sure how to answer that with my current local conversation rules. I can explain who I am or what this prototype can do.", 'thinking');
+  return Object.freeze({ schemaVersion: 1, responses: Object.freeze(responses) });
+}
+
+export function createResponder(dialogueValue) {
+  const dialogue = validateDialogue(dialogueValue);
+  if (!dialogue) throw new TypeError('Dialogue data is invalid or incomplete.');
+  const history = [];
+  const remember = intent => {
+    if (!['invalid', 'fallback', 'followup-missing'].includes(intent)) history.push(intent);
+    while (history.length > 4) history.shift();
+  };
+  const build = intent => {
+    const entry = dialogue.responses[intent];
+    remember(intent);
+    return Object.freeze({ intent, text: entry.text, pose: entry.pose });
+  };
+  const latestTopic = () => [...history].reverse().find(intent => ['identity', 'identity-more', 'capabilities', 'movement', 'assistance-limited', 'assistance-reason'].includes(intent));
+
+  return Object.freeze({
+    respond(message) {
+      if (typeof message !== 'string') return build('invalid');
+      const input = clean(message.slice(0, 300));
+      if (!input) return build('invalid');
+      if (/\bwhat about (movement|moving|walking)\b|\bhow do you move\b/.test(input)) return build('movement');
+      if (/\bwhy (can't|cant|can not) you (help|assist)\b|\bwhy isn't assistance implemented\b/.test(input)) return build('assistance-reason');
+      if (/\b(tell me more|more about that|go on)\b/.test(input)) {
+        const topic = latestTopic();
+        if (topic === 'identity' || topic === 'identity-more') return build('identity-more');
+        if (topic === 'capabilities' || topic === 'movement') return build('movement');
+        if (topic === 'assistance-limited' || topic === 'assistance-reason') return build('assistance-reason');
+        return build('followup-missing');
+      }
+      if (/\b(hello|hi|hey|greetings)\b/.test(input)) return build('greeting');
+      if (/\b(who|what) are you\b|\btell me about yourself\b/.test(input)) return build('identity');
+      if (/\bwhat can you do\b|\bcapabilit(?:y|ies)\b/.test(input)) return build('capabilities');
+      if (/\b(help|assist|solve|question)\b/.test(input)) return build('assistance-limited');
+      if (/\b(thank you|thanks|thankyou)\b/.test(input)) return build('thanks');
+      if (/\b(goodbye|bye|see you|farewell)\b/.test(input)) return build('goodbye');
+      return build('fallback');
+    },
+    reset() { history.length = 0; },
+    snapshot: () => Object.freeze({ recentIntents: Object.freeze([...history]) })
+  });
 }
