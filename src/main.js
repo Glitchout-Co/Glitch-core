@@ -3,6 +3,7 @@ import { nextLifecycle } from './core/lifecycle.js';
 import { createCharacterRenderer } from './presentation/character/renderer.js';
 import { createPresenceBehaviour } from './engines/behaviour/presence.js';
 import { createPetInteraction } from './engines/behaviour/interactions.js';
+import { createRestBehaviour } from './engines/behaviour/rest.js';
 
 const controller = createController();
 const status = document.querySelector('#status');
@@ -22,6 +23,7 @@ const presence = createPresenceBehaviour({
   isReducedMotion: () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 });
 const petInteraction = createPetInteraction({ character, presence });
+const restBehaviour = createRestBehaviour({ character, presence });
 fetch('./data/character/glitch.json')
   .then(response => {
     if (!response.ok) throw new Error('Character data unavailable');
@@ -34,6 +36,7 @@ function render(snapshot) {
   character.render(snapshot);
   presence.setLifecycle(snapshot.lifecycle);
   petInteraction.setLifecycle(snapshot.lifecycle);
+  restBehaviour.setLifecycle(snapshot.lifecycle);
   petButton.disabled = snapshot.lifecycle !== 'running';
   for (const button of buttons) {
     button.disabled = !nextLifecycle(snapshot.lifecycle, button.dataset.command);
@@ -54,6 +57,7 @@ for (const button of poseButtons) {
 }
 petButton.addEventListener('click', () => petInteraction.pet());
 for (const button of document.querySelectorAll('button')) {
+  button.addEventListener('click', () => restBehaviour.notifyActivity(), { capture: true });
   button.addEventListener('click', () => presence.reset());
 }
 render(controller.snapshot());

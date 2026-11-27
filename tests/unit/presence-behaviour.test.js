@@ -6,6 +6,7 @@ test('presence action selection uses only approved actions', () => {
   assert.deepEqual(selectPresenceAction(0), { type: 'pose', value: 'standing' });
   assert.deepEqual(selectPresenceAction(1), { type: 'move', value: 'centre' });
   assert.equal(selectPresenceAction(1, true).type, 'pose');
+  assert.deepEqual(selectPresenceAction(0, false, 'pose:standing'), { type: 'pose', value: 'sitting' });
   assert.throws(() => selectPresenceAction(-0.1), RangeError);
   assert.throws(() => selectPresenceAction(Number.NaN), RangeError);
 });
@@ -32,8 +33,11 @@ test('presence routine schedules only while running and cancels on pause', () =>
   scheduled[0].callback();
   assert.deepEqual(calls, [['pose', 'standing']]);
   assert.equal(scheduled.length, 2);
+  scheduled[1].callback();
+  assert.deepEqual(calls, [['pose', 'standing'], ['pose', 'sitting']]);
+  assert.equal(scheduled.length, 3);
   presence.setLifecycle('paused');
-  assert.deepEqual(cancelled, [scheduled[1]]);
+  assert.deepEqual(cancelled, [scheduled[2]]);
   assert.deepEqual(presence.snapshot(), { lifecycle: 'paused', scheduled: false, held: false });
 });
 

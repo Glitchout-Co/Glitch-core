@@ -10,9 +10,12 @@ const STANDARD_ACTIONS = Object.freeze([
 ]);
 const REDUCED_MOTION_ACTIONS = Object.freeze(STANDARD_ACTIONS.filter(action => action.type === 'pose'));
 
-export function selectPresenceAction(randomValue, reducedMotion = false) {
+const actionKey = action => `${action.type}:${action.value}`;
+
+export function selectPresenceAction(randomValue, reducedMotion = false, previousAction = null) {
   if (!Number.isFinite(randomValue) || randomValue < 0 || randomValue > 1) throw new RangeError('Random value must be between zero and one.');
-  const actions = reducedMotion ? REDUCED_MOTION_ACTIONS : STANDARD_ACTIONS;
+  const available = reducedMotion ? REDUCED_MOTION_ACTIONS : STANDARD_ACTIONS;
+  const actions = available.filter(action => actionKey(action) !== previousAction);
   return actions[Math.min(actions.length - 1, Math.floor(randomValue * actions.length))];
 }
 
@@ -27,6 +30,7 @@ export function createPresenceBehaviour({
   let lifecycle = 'ready';
   let timer = null;
   let held = false;
+  let previousAction = null;
 
   const execute = action => action.type === 'pose' ? character.setPose(action.value) : character.move(action.value);
   const queue = () => {
@@ -36,7 +40,9 @@ export function createPresenceBehaviour({
     timer = schedule(() => {
       timer = null;
       if (lifecycle !== 'running') return;
-      execute(selectPresenceAction(random(), Boolean(isReducedMotion())));
+      const action = selectPresenceAction(random(), Boolean(isReducedMotion()), previousAction);
+      execute(action);
+      previousAction = actionKey(action);
       queue();
     }, delay);
   };
